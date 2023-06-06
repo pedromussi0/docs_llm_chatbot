@@ -1,0 +1,9 @@
+black
+flake8
+django
+psycopg2-binary
+langchain
+openai
+bs4
+requests
+python-dotenv
