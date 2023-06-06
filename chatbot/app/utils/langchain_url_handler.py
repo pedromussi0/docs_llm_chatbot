@@ -21,3 +21,4 @@ def load_urls_contents(urls: list):
 urls = get_urls()
 
 llm_data = load_urls_contents(urls)
+# the llm data will be used as a variable in the prompt template
