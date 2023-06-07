@@ -25,4 +25,4 @@ def chat(request):
 
     context = {"messages": messages}
 
-    return render(request, "chat/index.html", context)
+    return render(request, "app/index.html", context)

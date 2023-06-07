@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <div id="message-container">
+    {% for message in messages %}
+      <p><strong>{{ message.sender }}:</strong> {{ message.content }}</p>
+    {% endfor %}
+  </div>
+  <form method="POST" action="{% url 'app/chat' %}">
+    {% csrf_token %}
+    <input type="text" name="user_input" placeholder="Type your message here...">
+    <button type="submit">Send</button>
+  </form>
+</body>
+</html>
