@@ -15,7 +15,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def generate_chat(history, user_input):
-    context = llm_data
+    context = embeddings.decode(llm_data_embedded)
     chat_history = ChatMessageHistory()
     for message in history:
         if message["role"] == "user":

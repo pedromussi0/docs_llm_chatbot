@@ -12,9 +12,7 @@ def chat(request):
             {"role": msg.sender, "text": msg.content}
             for msg in ChatMessage.objects.all()
         ]
-        ai_response = generate_chat(
-            history, user_input
-        )  # Use llm_data from your_llm_script directly
+        ai_response = generate_chat(history, user_input, llm_data_embedded)
         ai_message = ChatMessage(sender="ai", content=ai_response)
         ai_message.save()
 
