@@ -20,6 +20,4 @@ def scrape_links(url):
 # Example usage:
 def get_urls(*args, **kwargs):
     url = "https://nextjs.org/docs"
-    links = scrape_links(url)
-    for link in links:
-        return link
+    return scrape_links(url)

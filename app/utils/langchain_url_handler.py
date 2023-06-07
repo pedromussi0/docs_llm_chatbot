@@ -1,5 +1,5 @@
 from langchain.document_loaders import UnstructuredURLLoader
-from link_scraper import *
+from .link_scraper import *
 
 
 def load_url_content(url: str):

@@ -18,8 +18,11 @@ def chat(request):
         ai_message = ChatMessage(sender="ai", content=ai_response)
         ai_message.save()
 
-    user_message = ChatMessage(sender="user", content=user_input)
-    user_message.save()
+        user_message = ChatMessage(sender="user", content=user_input)
+        user_message.save()
+
+    else:
+        user_input = ""  # Set default user_input when the page is initially loaded
 
     messages = ChatMessage.objects.all()
 

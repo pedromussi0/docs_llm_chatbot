@@ -1,5 +1,4 @@
-from langchain_url_handler import *
-from link_scraper import *
+from .langchain_url_handler import *
 import os
 from dotenv import load_dotenv
 import openai
@@ -27,7 +26,7 @@ def generate_chat(history, user_input):
     memory = ConversationBufferMemory(chat_memory=chat_history)
 
     prompt = PromptTemplate(
-        input_variables=["history", "input", "context"],
+        input_variables=["history", "user_input", "context"],
         template="Assistant is a large language model trained by OpenAI."
         "Assistant is designed to be able to assist with a wide range of tasks, from answering simple "
         "questions to providing"
@@ -52,7 +51,7 @@ def generate_chat(history, user_input):
         "{history}"
         "the following contents are updates in the 'nextjs' framework. please update your knowledge base"
         " according to it and assume its the latest update in the area: {context}"
-        "Human: {input};"
+        "Human: {user_input};"
         "Assistant:",
     )
 
@@ -63,7 +62,7 @@ def generate_chat(history, user_input):
         memory=memory,
     )
 
-    output = chatgpt_chain.predict(input=user_input, context=context)
+    output = chatgpt_chain.predict(user_input=user_input, context=context)
     # nesta funcao acima utilizaremos a logica da view para trazer o user_input  do front para o back 'seguir logicas'
     # dos projetos passados
 
