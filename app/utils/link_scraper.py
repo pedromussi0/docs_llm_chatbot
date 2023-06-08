@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from django.conf import settings
 
 
 def scrape_links(url):
@@ -18,6 +19,6 @@ def scrape_links(url):
 
 
 # Example usage:
-def get_urls(*args, **kwargs):
-    url = "https://nextjs.org/docs"
+def get_urls():
+    url = settings.NEXT_DOCS_URL
     return scrape_links(url)

@@ -1,41 +1,34 @@
 from langchain.document_loaders import UnstructuredURLLoader
 from .link_scraper import *
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.retrievers.document_compressors import EmbeddingsFilter
+from langchain.schema import Document
+from typing import List
 
 
-def load_url_content(url: str):
-    loader = UnstructuredURLLoader(urls=[url])
-    data = loader.load()
-    return data[0] if data else None
+def load_documents(scraped_links: list) -> List[Document]:
+    loader = UnstructuredURLLoader(urls=scraped_links)
+
+    documents = []
+
+    for url, content in zip(scraped_links, loader.load()):
+        document = Document(content=content)
+        documents.append(document)
+
+    return documents
 
 
-def load_urls_contents(urls: list):
-    data = []
-    for url in urls:
-        url_data = load_url_content(url)
-        if url_data:
-            data.append(url_data)
+scraped_links = scrape_links(url=settings.NEXT_DOCS_URL)
 
-    return data
-
-
-urls = get_urls()
-
-# the llm data will be used as a variable in the prompt template
 
 # ------------------- embeddings -------------------------------
 embeddings = OpenAIEmbeddings()
 
 
-def embed_documents(contents):
-    embedded_contents = []
-    for content in contents:
-        embedded_content = embeddings.embed_document(content)
-        embedded_contents.append(embedded_content)
+def embed_documents(documents):
+    embedded_documents = []
+    for doc in documents:
+        embedded_doc = embeddings.embed_document(doc.content)
+        embedded_doc.metadata.update({"url": doc.url})
+        embedded_documents.append(embedded_doc)
 
-    return embedded_contents
-
-
-llm_data_contents = load_urls_contents(urls)
-llm_data_embedded = embed_documents(llm_data_contents)
+    return embedded_documents
