@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Question Answering Search</title>
 </head>
 <body>
-  <div id="message-container">
-    {% for message in messages %}
-      <p><strong>{{ message.sender }}:</strong> {{ message.content }}</p>
-    {% endfor %}
-  </div>
-  <form method="POST" action="{% url 'app/chat' %}">
-    {% csrf_token %}
-    <input type="text" name="user_input" placeholder="Type your message here...">
-    <button type="submit">Send</button>
-  </form>
+    <h1>Question Answering Search</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="context">Context:</label>
+        <textarea name="context" id="context" cols="30" rows="10"></textarea>
+        <br>
+        <label for="question">Question:</label>
+        <input type="text" name="question" id="question">
+        <br>
+        <input type="submit" value="Search">
+    </form>
+
+    {% if answer %}
+    <h2>Answer:</h2>
+    <p>{{ answer }}</p>
+    {% endif %}
 </body>
 </html>

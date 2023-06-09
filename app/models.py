@@ -19,4 +19,3 @@ class ChatMessage(models.Model):
 class ProcessedDocument(models.Model):
     content = models.TextField()
     url = models.TextField()
-    embedded_document = models.JSONField(null=True)

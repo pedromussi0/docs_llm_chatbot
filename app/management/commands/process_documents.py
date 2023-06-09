@@ -9,35 +9,35 @@ class Command(BaseCommand):
     help = "Scrape URLs, load documents, and embed their contents"
 
     def handle(self, *args, **options):
-        scraped_links = scrape_links(url=settings.NEXT_DOCS_URL)
-        self.stdout.write(self.style.SUCCESS("Successfully scraped URLs"))
+        try:
+            scraped_links = scrape_links(url=settings.NEXT_DOCS_URL)
+            self.stdout.write(self.style.SUCCESS("Successfully scraped URLs"))
+        except ValueError as e:
+            self.stderr.write(self.style.ERROR(f"Error while scraping URLs: {e}"))
+            return
 
-        # self.stderr.write(self.style.ERROR(f"Error while scraping URLs: {e}"))
-        # return
+        try:
+            documents = load_documents(scraped_links)
+            for doc in documents:
+                print(doc)
+            self.stdout.write(self.style.SUCCESS("Successfully loaded documents"))
+        except ValueError as e:
+            self.stderr.write(self.style.ERROR(f"Error while loading documents: {e}"))
+            return
 
-        scraped_links = scraped_links[0:3]
-        documents = load_documents(scraped_links)
-        for doc in documents:
-            print(doc)
-        self.stdout.write(self.style.SUCCESS("Successfully loaded documents"))
+        try:
+            embedded_documents = embed_documents(documents)
+            self.stdout.write(self.style.SUCCESS("Successfully embedded documents"))
+        except ValueError as e:
+            self.stderr.write(self.style.ERROR(f"Error while embedding documents: {e}"))
+            return
 
-        # self.stderr.write(self.style.ERROR(f"Error while loading documents: {e}"))
-        # return
+        # Save documents to the database
+        for documents, embedded_document in zip(documents, embedded_documents):
+            doc = ProcessedDocument(
+                content=ProcessedDocument.content,
+                url=ProcessedDocument.url,
+            )
+            doc.save()
 
-        embedded_documents = embed_documents(documents)
-
-        self.stdout.write(self.style.SUCCESS("Successfully embedded documents"))
-        # except Exception as e:
-        #     self.stderr.write(self.style.ERROR(f"Error while embedding documents: {e}"))
-        #     return
-
-        # # Save documents to the database
-        # for document, embedded_document in zip(documents, embedded_documents):
-        #     doc = ProcessedDocument(
-        #         content=document.content,
-        #         url=document.url,
-        #         embedded_document=embedded_document,
-        #     )
-        #     doc.save()
-
-        # self.stdout.write(self.style.SUCCESS('Documents saved to the database'))
+        self.stdout.write(self.style.SUCCESS("Documents saved to the database"))
