@@ -16,9 +16,3 @@ def scrape_links(url):
             links.append(absolute_url)
 
     return links
-
-
-# Example usage:
-def get_urls():
-    url = settings.NEXT_DOCS_URL
-    return scrape_links(url)

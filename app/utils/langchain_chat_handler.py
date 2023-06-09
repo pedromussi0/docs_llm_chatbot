@@ -14,7 +14,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-def generate_chat(history, user_input,context):
+def generate_chat(history, user_input, context):
     context = embeddings.decode(llm_data_embedded)
     chat_history = ChatMessageHistory()
     for message in history:

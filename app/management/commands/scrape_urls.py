@@ -9,8 +9,8 @@ class Command(BaseCommand):
         scraped_links = get_urls()
 
         # Save scraped_links to a file or other data storage
-        with open('scraped_links.txt', 'w') as f:
+        with open("scraped_links.txt", "w") as f:
             for link in scraped_links:
                 f.write(f"{link}\n")
 
-        self.stdout.write(self.style.SUCCESS('Successfully scraped URLs'))
+        self.stdout.write(self.style.SUCCESS("Successfully scraped URLs"))

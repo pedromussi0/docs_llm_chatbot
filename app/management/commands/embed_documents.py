@@ -9,4 +9,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         documents = Document.objects.all()
         embed_documents(documents)
-        self.stdout.write(self.style.SUCCESS('Successfully embedded documents'))
+        self.stdout.write(self.style.SUCCESS("Successfully embedded documents"))
