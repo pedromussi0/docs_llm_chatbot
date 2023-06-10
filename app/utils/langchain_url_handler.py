@@ -12,11 +12,16 @@ scraped_links = scrape_links(url=settings.NEXT_DOCS_URL)
 
 def load_documents(scraped_links: list) -> List[Document]:
     documents = []
+    error_urls = []
 
     for url in scraped_links:
-        loader = SeleniumURLLoader(urls=[url])
-        new_documents = loader.load()
-        documents.extend(new_documents)
+        try:
+            loader = SeleniumURLLoader(urls=[url])
+            new_documents = loader.load()
+            documents.extend(new_documents)
+        except ValueError:
+            # Append the URL to the error list if loading fails
+            error_urls.append(url)
 
     return documents
 
@@ -28,9 +33,15 @@ embeddings = OpenAIEmbeddings()
 def embed_documents(documents):
     embeddings = OpenAIEmbeddings()
     embedded_documents = []
+    error_urls = []
+
     for doc in documents:
-        embedded_doc = embeddings.embed_documents(doc.page_content)
-        embedded_documents.append(embedded_doc)
+        try:
+            embedded_doc = embeddings.embed_documents(doc.page_content)
+            embedded_documents.append(embedded_doc)
+        except ValueError:
+            # Append the URL to the error list if embedding fails
+            error_urls.append(doc.url)
 
     return embedded_documents
 

@@ -9,6 +9,9 @@ class Command(BaseCommand):
     help = "Scrape URLs, load documents, and embed their contents"
 
     def handle(self, *args, **options):
+        error_urls = []
+        existing_urls = set(ProcessedDocument.objects.values_list("url", flat=True))
+
         try:
             scraped_links = scrape_links(url=settings.NEXT_DOCS_URL)
             self.stdout.write(self.style.SUCCESS("Successfully scraped URLs"))
@@ -16,28 +19,73 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(f"Error while scraping URLs: {e}"))
             return
 
-        try:
-            documents = load_documents(scraped_links)
-            for doc in documents:
-                print(doc)
-            self.stdout.write(self.style.SUCCESS("Successfully loaded documents"))
-        except ValueError as e:
-            self.stderr.write(self.style.ERROR(f"Error while loading documents: {e}"))
-            return
+        for url in scraped_links:
+            if url in existing_urls:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Duplicate URL found. Skipping processing: {url}"
+                    )
+                )
+                continue
 
-        try:
-            embedded_documents = embed_documents(documents)
-            self.stdout.write(self.style.SUCCESS("Successfully embedded documents"))
-        except ValueError as e:
-            self.stderr.write(self.style.ERROR(f"Error while embedding documents: {e}"))
-            return
+            try:
+                documents = load_documents([url])
+                self.stdout.write(
+                    self.style.SUCCESS(f"Successfully loaded document from URL: {url}")
+                )
+            except ValueError:
+                self.stderr.write(
+                    self.style.ERROR(f"Error while loading document from URL: {url}")
+                )
+                error_urls.append(url)
+                continue
 
-        # Save documents to the database
-        for documents, embedded_document in zip(documents, embedded_documents):
-            doc = ProcessedDocument(
-                content=ProcessedDocument.content,
-                url=ProcessedDocument.url,
+            try:
+                embedded_documents = embed_documents(documents)
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Successfully embedded document from URL: {url}"
+                    )
+                )
+            except ValueError:
+                self.stderr.write(
+                    self.style.ERROR(f"Error while embedding document from URL: {url}")
+                )
+                error_urls.append(url)
+                continue
+
+            # Save the document to the database
+            for document in documents:
+                try:
+                    if document.metadata["source"] in existing_urls:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Duplicate URL found. Skipping saving: {document.metadata['source']}"
+                            )
+                        )
+                        continue
+
+                    doc = ProcessedDocument(
+                        content=document.page_content,
+                        url=document.metadata["source"],
+                    )
+                    doc.save()
+                    existing_urls.add(document.metadata["source"])
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"Document saved to the database: {document.metadata['source']}"
+                        )
+                    )
+                except Exception:
+                    error_urls.append(document.metadata["source"])
+                    self.stderr.write(
+                        self.style.ERROR(
+                            f"Error saving document with URL: {document.metadata['source']}"
+                        )
+                    )
+
+        # Handle errors
+        for url in error_urls:
+            self.stderr.write(
+                self.style.ERROR(f"Document processing failed for URL: {url}")
             )
-            doc.save()
-
-        self.stdout.write(self.style.SUCCESS("Documents saved to the database"))
