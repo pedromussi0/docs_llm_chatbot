@@ -1,8 +1,11 @@
+import langchain
 from langchain.document_loaders import SeleniumURLLoader
 from .link_scraper import *
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import FAISS
+from langchain.docstore import InMemoryDocstore
+import faiss
 from langchain.schema import Document
 from typing import List
 import openai

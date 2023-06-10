@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 class Command(BaseCommand):
-    help = "Scrape URLs, load documents, and embed their contents"
+    help = "Scrape URLs, load documents,saves them to the db"
 
     def handle(self, *args, **options):
         error_urls = []
@@ -36,20 +36,6 @@ class Command(BaseCommand):
             except ValueError:
                 self.stderr.write(
                     self.style.ERROR(f"Error while loading document from URL: {url}")
-                )
-                error_urls.append(url)
-                continue
-
-            try:
-                embedded_documents = embed_documents(documents)
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"Successfully embedded document from URL: {url}"
-                    )
-                )
-            except ValueError:
-                self.stderr.write(
-                    self.style.ERROR(f"Error while embedding document from URL: {url}")
                 )
                 error_urls.append(url)
                 continue
