@@ -1,6 +1,7 @@
 import langchain
 from langchain.document_loaders import SeleniumURLLoader
 from .link_scraper import *
+from app.models import ProcessedDocument
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
@@ -30,23 +31,39 @@ def load_documents(scraped_links: list) -> List[Document]:
 
 
 # ------------------- embeddings -------------------------------
-embeddings = OpenAIEmbeddings()
+
+processed_documents = ProcessedDocument.objects.all()
 
 
-def embed_documents(documents):
+def get_split_docs():
+    documents = [
+        Document(page_content=doc.content, metadata={"source": doc.url})
+        for doc in processed_documents
+    ]
+    text_splitter = CharacterTextSplitter(
+        separator="\n", chunk_size=1000, chunk_overlap=200
+    )
+    docs = text_splitter.split_documents(documents)
+
+    return docs
+
+
+def embed_documents(docs):
     embeddings = OpenAIEmbeddings()
     embedded_documents = []
-    error_urls = []
 
-    for doc in documents:
-        try:
-            embedded_doc = embeddings.embed_documents(doc.page_content)
-            embedded_documents.append(embedded_doc)
-        except ValueError:
-            # Append the URL to the error list if embedding fails
-            error_urls.append(doc.url)
+    for doc in docs:
+        embedded_doc = embeddings.embed_documents(doc.page_content)
+        embedded_documents.append(embedded_doc)
 
     return embedded_documents
+
+
+def get_vectorstore(docs):
+    embeddings = OpenAIEmbeddings()
+    vectorstore = FAISS.from_documents(documents=docs, embedding=embeddings)
+
+    return vectorstore
 
 
 # --------------------- querying --------------------------------

@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Question Answering Search</title>
+    <title>LLM Form</title>
 </head>
 <body>
-    <h1>Question Answering Search</h1>
-    <form method="POST">
+    <h1>LLM Form</h1>
+    <form method="post" action="{% url 'chat_view' %}">
         {% csrf_token %}
-        <label for="context">Context:</label>
-        <textarea name="context" id="context" cols="30" rows="10"></textarea>
-        <br>
-        <label for="question">Question:</label>
-        <input type="text" name="question" id="question">
-        <br>
-        <input type="submit" value="Search">
+        <label for="user_input">User Input:</label>
+        <input type="text" name="user_input" id="user_input">
+        <input type="submit" value="Submit">
     </form>
-
-    {% if answer %}
-    <h2>Answer:</h2>
-    <p>{{ answer }}</p>
+    {% if response %}
+        <h2>Response:</h2>
+        <p>{{ response }}</p>
     {% endif %}
 </body>
 </html>

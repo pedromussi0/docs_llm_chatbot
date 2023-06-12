@@ -4,7 +4,7 @@ from langchain.docstore.document import Document
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.docstore import InMemoryDocstore
-from langchain.text_splitter import SpacyTextSplitter
+from langchain.text_splitter import CharacterTextSplitter
 from django.core.cache import cache
 import faiss
 import time
@@ -23,17 +23,23 @@ class Command(BaseCommand):
             for doc in processed_documents
         ]
 
+        # Split the documents into chunks using CharacterTextSplitter
+        text_splitter = CharacterTextSplitter(
+            separator="\n", chunk_size=1000, chunk_overlap=200
+        )
+        docs = text_splitter.split_documents(documents)
+
         # Initialize Embeddings and the FAISS vector store
         embeddings = OpenAIEmbeddings()
         embedding_size = 1536
         index = faiss.IndexFlatL2(embedding_size)
         vector_store = FAISS(embeddings.embed_query, index, InMemoryDocstore({}), {})
 
-        delay_between_calls = 50 / len(documents)  # Calculate the required delay
-        vector_stores_left = len(documents)
+        delay_between_calls = 50 / len(docs)  # Calculate the required delay
+        vector_stores_left = len(docs)
 
         # Add the documents to the vector_store with a delay
-        for document in documents:
+        for document in docs:
             # Introduce a delay
             time.sleep(delay_between_calls)
             vector_store.add_documents([document])
