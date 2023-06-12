@@ -1,14 +1,12 @@
 from langchain import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
 from .langchain_url_handler import get_split_docs, get_vectorstore, embed_documents
 import os
 from dotenv import load_dotenv
 import openai
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.text_splitter import CharacterTextSplitter
 from langchain.llms import OpenAI
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
 from app.models import ProcessedDocument
 
 load_dotenv()

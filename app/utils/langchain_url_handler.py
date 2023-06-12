@@ -59,24 +59,20 @@ def embed_documents(docs):
     return embedded_documents
 
 
-def get_vectorstore(docs):
+def get_vectorstore():
     embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(documents=docs, embedding=embeddings)
 
-    return vectorstore
+    return FAISS.load_local(
+        "app/vectorstore", index_name="faiss_index", embeddings=embeddings
+    )
 
 
 # --------------------- querying --------------------------------
 
 
-def find_answer(query_embedding, embedded_documents, documents):
-    # Calculate scores based on embeddings
-    scores = [embedding @ query_embedding.T for embedding in embedded_documents]
+def find_answer(user_input):
+    db = get_vectorstore()
 
-    # Find the index of the highest score
-    best_index = scores.index(max(scores))
+    response = db.similarity_search(query=user_input)
 
-    # Retrieve the corresponding document for the best score
-    best_document_content = documents[best_index]
-
-    return best_document_content, best_index
+    return response
