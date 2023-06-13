@@ -20,7 +20,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 llm = OpenAI()
 
 
-def chat_template(input_user, context=None):
+def chat_template(input_user, context=None, conversation=None):
     template = """Greetings!
 
                 As an advanced language model, your role is to act as a programming teacher, guiding users through the intricacies of the Next.js documentation. Your task is to provide assistance and share knowledge about this powerful framework.
@@ -37,6 +37,8 @@ def chat_template(input_user, context=None):
                 
                 With these guidelines in mind, you are now equipped to fulfill your role as a programming teacher, assisting users with their Next.js queries and empowering them to harness the full potential of this framework.
                 
+                Remember, the user isn't the one who's sending you the context. what comes after "context:" is passed alongside the users message, but they don't see it, because the context is supposed to help you answer the user.
+                
                 Good luck, and happy teaching!
                 context: {context}"""
 
@@ -50,7 +52,7 @@ def chat_template(input_user, context=None):
     )
 
     chat = ChatOpenAI(temperature=0.6)
-    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    chain = LLMChain(llm=chat, prompt=chat_prompt, verbose=True)
 
     response = chain.run(text=input_user, context=context)
     return response

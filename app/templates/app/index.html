@@ -1,19 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>LLM Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Example</title>
 </head>
 <body>
-    <h1>LLM Form</h1>
-    <form method="post" action="{% url 'chat_view' %}">
-        {% csrf_token %}
-        <label for="user_input">User Input:</label>
-        <input type="text" name="user_input" id="user_input">
-        <input type="submit" value="Submit">
-    </form>
-    {% if response %}
-        <h2>Response:</h2>
-        <p>{{ response }}</p>
-    {% endif %}
+    <div>
+        <form method="post" action="{% url 'chat_view' %}">
+            {% csrf_token %}
+            <label for="input_user">Your message:</label>
+            <input type="text" id="input_user" name="input_user">
+            <br>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <div>
+        <h2>Conversation</h2>
+        {% for message in chat_data.conversation %}
+            {% if message.0 == 'user' %}
+                <p>User: {{ message.1 }}</p>
+            {% elif message.0 == 'AI' %}
+                <p>AI: {{ message.1 }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
 </body>
 </html>
