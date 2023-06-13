@@ -70,9 +70,12 @@ def get_vectorstore():
 # --------------------- querying --------------------------------
 
 
-def find_answer(user_input):
+def get_answer(user_input):
     db = get_vectorstore()
 
     response = db.similarity_search(query=user_input)
+    filtered_response = [
+        {"content": doc.page_content, "metadata": doc.metadata} for doc in response
+    ]
 
-    return response
+    return filtered_response
