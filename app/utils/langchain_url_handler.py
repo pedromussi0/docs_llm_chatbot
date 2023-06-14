@@ -63,7 +63,7 @@ def get_vectorstore():
     embeddings = OpenAIEmbeddings()
 
     return FAISS.load_local(
-        "app/vectorstore", index_name="faiss_index", embeddings=embeddings
+        "app/vectorstore/nextembeds", index_name="faiss_index", embeddings=embeddings
     )
 
 

@@ -41,7 +41,7 @@ def chat_template(input_user, context=None, conversation=None):
                 
                 Good luck, and happy teaching!
                 context: {context}"""
-
+    # transformar isso tudo numa initial message
     human_template = "{text}"
 
     ai_message_prompt = AIMessagePromptTemplate.from_template(template)

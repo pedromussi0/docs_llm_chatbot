@@ -6,11 +6,12 @@ from django.conf import settings
 
 
 class Command(BaseCommand):
-    help = "Scrape URLs, load documents,saves them to the db"
+    help = "Scrape URLs, load documents, and save them to the db"
 
     def handle(self, *args, **options):
         error_urls = []
         existing_urls = set(ProcessedDocument.objects.values_list("url", flat=True))
+        processed_urls = set()  # Track processed URLs
 
         try:
             scraped_links = scrape_links(url=settings.NEXT_DOCS_URL)
@@ -20,7 +21,7 @@ class Command(BaseCommand):
             return
 
         for url in scraped_links:
-            if url in existing_urls:
+            if url in existing_urls or url in processed_urls:
                 self.stdout.write(
                     self.style.WARNING(
                         f"Duplicate URL found. Skipping processing: {url}"
@@ -56,6 +57,7 @@ class Command(BaseCommand):
                         url=document.metadata["source"],
                     )
                     doc.save()
+                    processed_urls.add(document.metadata["source"])  # Add processed URL
                     existing_urls.add(document.metadata["source"])
                     self.stdout.write(
                         self.style.SUCCESS(
