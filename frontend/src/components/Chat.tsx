@@ -5,35 +5,32 @@ const Chat: React.FC = () => {
   const [conversation, setConversation] = useState<Array<[string, string]>>([]);
 
   useEffect(() => {
-    fetch('/chat/')
-      .then(response => response.json())
-      .then(data => setConversation(data.conversation));
+    fetchConversation();
   }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const fetchConversation = () => {
+  fetch('/chat/')
+    .then(response => response.json())
+    .then(data => setConversation(data.conversation));
+};
 
-    // Get the CSRF token from the cookie
-    const csrfToken = document.cookie
-      .split(';')
-      .map(c => c.trim())
-      .filter(c => c.startsWith('csrftoken='))[0]
-      .split('=')[1];
+const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
 
-    fetch('/chat/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken, // Add the CSRF token to the headers
-      },
-      body: JSON.stringify({ input_user: inputValue }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        setInputValue('');
-        setConversation(data.conversation);
-      });
-  };
+  fetch('http://localhost:8000/chat/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ input_user: inputValue }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      setInputValue('');
+      setConversation(data.conversation);
+    });
+};
+
 
   return (
     <div>
@@ -52,11 +49,17 @@ const Chat: React.FC = () => {
 
       <div>
         <h2>Conversation</h2>
-        {conversation.map((message, index) => (
-          <p key={index}>
-            {message[0] === 'user' ? 'User' : 'AI'}: {message[1]}
-          </p>
-        ))}
+        <div className="chat-container">
+          {conversation.map((message, index) => (
+            <div
+              key={index}
+              className={`message ${message[0] === 'user' ? 'user-message' : 'ai-message'}`}
+            >
+              <span className="message-sender">{message[0]}</span>
+              <span className="message-text">{message[1]}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

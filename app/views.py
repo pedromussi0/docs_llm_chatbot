@@ -9,10 +9,13 @@ from .utils.langchain_chat_handler import chat_template
 from django.http import JsonResponse
 from app.models import ProcessedDocument
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 
+@csrf_exempt
 def chat_view(request):
     if request.method == "POST":
+        # Handle POST request as before
         data = json.loads(request.body.decode("utf-8"))
         user_input = data.get("input_user")
 
@@ -28,10 +31,16 @@ def chat_view(request):
 
         request.session["conversation"] = conversation
 
-        chat_data = {
-            "conversation": conversation  # Pass the entire conversation to the template
-        }
+        chat_data = {"conversation": conversation}
 
-        return render(request, "index.html", {"chat_data": chat_data})
+        return JsonResponse(chat_data)
+    elif request.method == "GET":
+        # Handle GET request to fetch the conversation
+        conversation = request.session.get("conversation", [])
+
+        chat_data = {"conversation": conversation}
+
+        return JsonResponse(chat_data)
     else:
-        return render(request, "index.html")
+        # Handle other request methods
+        return JsonResponse({"error": "Invalid request method."})
