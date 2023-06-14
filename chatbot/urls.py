@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
+from django.views.generic import TemplateView
+import os
+from chatbot.settings import BASE_DIR
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
