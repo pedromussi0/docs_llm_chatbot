@@ -26,8 +26,15 @@ const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
   })
     .then(response => response.json())
     .then(data => {
+      console.log(data); // Log the response data for inspection
       setInputValue('');
-      setConversation(data.conversation);
+      const aiResponse = data.response; // Extract the AI's response from the 'response' key
+      const updatedConversation: Array<[string, string]> = [
+        ...conversation,
+        ['user', inputValue],
+        ['AI', aiResponse]
+      ];
+      setConversation(updatedConversation);
     });
 };
 

@@ -17,12 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
-from django.views.generic import TemplateView
 import os
 from chatbot.settings import BASE_DIR
-
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("chat/", views.chat_view, name="chat_view"),
+    path("submit-message/", views.submit_message, name="submit_message"),
+    path("api/", include("app.urls")),
 ]

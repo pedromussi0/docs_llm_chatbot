@@ -10,37 +10,66 @@ from django.http import JsonResponse
 from app.models import ProcessedDocument
 import json
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import ChatMessage
+from .serializers import ChatMessageSerializer
 
 
+# ------------------------------------------------------------------------------
+
+
+class ChatMessageView(APIView):
+    def get(self, request):
+        messages = ChatMessage.objects.all()
+        serializer = ChatMessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ChatMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ------------------------------------------------------------------------------
 @csrf_exempt
-def chat_view(request):
+def submit_message(request):
     if request.method == "POST":
-        # Handle POST request as before
         data = json.loads(request.body.decode("utf-8"))
         user_input = data.get("input_user")
 
-        conversation = request.session.get("conversation", [])
+        user_message = ChatMessage.objects.create(sender="user", content=user_input)
 
-        conversation.append(("user", user_input))
-
+        # Generate AI response using chat_template
         response = chat_template(
-            user_input, context=get_answer(user_input), conversation=conversation
+            user_input, context=get_answer(user_input), conversation=[user_message]
         )
 
-        conversation.append(("AI", response))
+        ai_message = ChatMessage.objects.create(sender="ai", content=response)
 
-        request.session["conversation"] = conversation
+        # Return the AI response message as JSON
+        response_data = {
+            "sender": ai_message.sender,
+            "content": ai_message.content,
+            "timestamp": ai_message.timestamp,
+        }
+        return JsonResponse(response_data)
 
-        chat_data = {"conversation": conversation}
-
-        return JsonResponse(chat_data)
     elif request.method == "GET":
-        # Handle GET request to fetch the conversation
-        conversation = request.session.get("conversation", [])
-
+        messages = ChatMessage.objects.all()
+        conversation = [
+            {
+                "sender": message.sender,
+                "content": message.content,
+                "timestamp": message.timestamp,
+            }
+            for message in messages
+        ]
         chat_data = {"conversation": conversation}
-
         return JsonResponse(chat_data)
+
     else:
-        # Handle other request methods
         return JsonResponse({"error": "Invalid request method."})
