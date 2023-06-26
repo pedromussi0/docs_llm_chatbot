@@ -9,7 +9,7 @@ const Chat: React.FC = () => {
   }, []);
 
   const fetchConversation = () => {
-  fetch('/chat/')
+  fetch('http://localhost:8000/submit-message')
     .then(response => response.json())
     .then(data => setConversation(data.conversation));
 };

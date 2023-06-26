@@ -20,10 +20,9 @@ from app import views
 import os
 from chatbot.settings import BASE_DIR
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("submit-message/", views.submit_message, name="submit_message"),
-    path("api/", include("app.urls")),
+    path("", include("app.urls")),
+    path("api/", include("api.urls")),
 ]
