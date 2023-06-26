@@ -19,6 +19,7 @@
       <excludeFolder url="file://$MODULE_DIR$/env090601" />
       <excludeFolder url="file://$MODULE_DIR$/env" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
+      <excludeFolder url="file://$MODULE_DIR$/chatdjango" />
       <excludeFolder url="file://$MODULE_DIR$/chatdjango/Lib/site-packages/amqp" />
       <excludeFolder url="file://$MODULE_DIR$/chatdjango/Lib/site-packages/amqp-5.1.1.dist-info" />
       <excludeFolder url="file://$MODULE_DIR$/chatdjango/Lib/site-packages/billiard" />
